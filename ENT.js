@@ -35,10 +35,12 @@ function ENT(type,frm,cnt){
 		case 4:
 			this.ct = ticker;
 			this.dmg = frm.dmg;
+			this.a = frm.a;
 			this.vx = 0;
 			this.vy = 0;
 			this.x = frm.x;
 			this.y = frm.y;
+			this.bstr = frm.bstr;
 			this.size = frm.bsize;
 			this.expvel = frm.expvel;
 			this.maxsz = frm.exprad;
@@ -69,7 +71,7 @@ ENT.prototype.draw = function(){
 			break;
 		
 		case 4: //bubbles
-			ctx.strokeStyle = "#E00";
+			ctx.strokeStyle = "#F40";//rgba(255,0,0,(this.fadetime/this.fadeini));
 			ctx.lineWidth=2;
 			ctx.beginPath();
 			ctx.arc(this.x,this.y,this.size,0,Math.PI*2);
@@ -84,7 +86,8 @@ ENT.prototype.move = function(){
 	switch(this.type){
 		case 4: //bubbles
 			if(this.size <= this.maxsz) this.size+=this.expvel;
-			else death(ent,ent[ent.indexOf(this)]);
+			else if(this.fadetime<=0) death(ent,ent[ent.indexOf(this)]);
+			else this.fadetime--;
 			break;
 		default: //bullets
 			this.x+=this.vx*Math.cos(this.a);

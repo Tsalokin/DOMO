@@ -102,6 +102,7 @@ DOMO.prototype.draw = function(){
 		}
 	}else if (this.bblt==0){
 		this.bblc++;
+		this.bubble = false;
 	}
 	
 	this.sht ? DOMO.shoot(this.wpn): 0;

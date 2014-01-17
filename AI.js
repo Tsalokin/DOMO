@@ -26,15 +26,17 @@ function ai(type){
 		case 2: //circles
 			this.hlt = 20;
 			this.mhlt = 20;
-			this.dmg = 1;
-			this.bstr = 10;
+			this.dmg = 5;
+			this.bstr = 1000;
 			this.ht = 0;
 			this.rld = 0;
-			this.rldt = rndr(150,200);
+			this.fadetime = 10;
+			this.fadeini=this.fadetime;
+			this.rldt = rndr(100,200);
 			this.bsize = 10;
-			this.expvel = 5;
-			this.exprad = 75;
-			this.td = 200;
+			this.expvel = 10;
+			this.exprad = 100;
+			this.td = this.exprad*0.9;
 			this.bst = 3;
 			this.speed = rndr(0.2,0.3,1);
 			this.vd = 600;

@@ -67,27 +67,27 @@ function animate(){
 			var fnd = nn(gai[i],efnd);
 			if(gai.indexOf(fnd[1].frm)==-1){ //means bullet is not friendly fire
 			
-				if(!fnd[1].size&&(fnd[0]<10)){ // not a bubble attack, and close enough to hit, damages good AI and de-spawns bullet
-					//gai[i].hlt-=fnd[1].dmg;
+				if((!fnd[1].size)&&(fnd[0]<10)){ // not a bubble attack, and close enough to hit, damages good AI and de-spawns bullet
+					gai[i].hlt-=fnd[1].dmg;
 					death(ent,fnd[1]);
 				}else if(fnd[1].size&& (fnd[0]<fnd[1].size)){ // bubble attack close enough to hit, will repel and damage good AI
-					//gai[i].hlt-=fnd[1].dmg;
+					
 					var rpfact=(fnd[1].bstr/(dist(gai[i],fnd[1])+1));
 					var a = Math.atan2( gai[i].y-fnd[1].y, gai[i].x-fnd[1].x);
-					console.log(fnd[1].bstr+"  "+(dist(gai[i],fnd[1])+1)+" "+(rpfact*Math.cos(a)+gai[i].vx));
 					gai[i].vx = rpfact*Math.cos(a)+gai[i].vx;
-					gai[i].vy = rpfact*Math.sin(a)+gai[i].vy;	
+					gai[i].vy = rpfact*Math.sin(a)+gai[i].vy;
+					gai[i].hlt-=fnd[1].dmg*rpfact/fnd[1].bstr;					
 				}
 			}
 		}
-		for(var i in bai){
+		for(var i=0; i<bai.length; i++){
 			bai[i].draw();
 			bai[i].color=0;
 			bai[i].move();
 			if(bai[i].hlt<=0){death(bai,bai[i])}
 		}
 		
-		for(var i in gai){
+		for(var i=0; i<gai.length; i++){
 			gai[i].draw();
 			ctx.fillStyle = "#000";
 			ctx.fillText(Math.round(DOMO.x)+", "+Math.round(DOMO.y), DOMO.x,DOMO.y-18);
@@ -95,12 +95,16 @@ function animate(){
 			if(gai[i].hlt<=0){death(gai,gai[i]);}
 		}
 		
-		for(var i in ent){
-			ent[i].draw();
-			ent[i].move();
-			if(Math.abs(ent[i].ct-ticker)>=200){
-				death(ent,ent[i]);
-				i--;
+		for(var i=0; i<ent.length; i++){
+			try{
+				ent[i].draw();
+				ent[i].move();
+				if(Math.abs(ent[i].ct-ticker)>=200){
+					death(ent,ent[i]);
+					i--;
+				}
+			}catch(error){
+				console.log("SHIT");
 			}
 		}
 		
@@ -177,10 +181,11 @@ function angle( a1, a2 ){
 }
 
 function mapdrw(){
+	ctx.fillStyle = "#fff";
 	for(i in map){
-		if(map[i]!=null){
-			ctx.fillStyle = "#fff";
+		if(map[i]!= null){
 			ctx.fillRect(map[i][0],map[i][1],map[i][2],map[i][3]);
+			ctx.closePath();
 		}
 	}
 }
