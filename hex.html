@@ -1,0 +1,278 @@
+<html>
+	<head>
+		<style>
+			body { 
+				margin: 0; 
+				background-color:#000;
+			}
+			canvas{
+				background-color:#fff;
+			}
+		</style>
+		<script src="http://ajm13.com/cvutils.js"></script>
+		<script>
+			window.onload = function(){
+				//defining variables
+				cv = document.getElementById("canvas");
+				ctx = cv.getContext("2d");
+				ctx.fullscreen(1000,500);
+				ctx.textAlign = "center";
+				ctx.textBaseline = "middle";
+				
+				skp=0;
+				friction = 0.95;
+				
+				ctx.strokeStyle = "FF8000";
+				ctx.fillStyle = "FF8000";
+				
+				ctx.font = "9px Courier";
+				DOMO = new bot(0);
+				aia = [];
+				gaia = [];
+				for( var i = 0; i < 4; i++){
+					aia.push(new bot(1, DOMO, (Math.random()*0.3)+0.4, 3));
+				}
+				for( var i = 0; i < 4; i++){
+					aia.push(new bot(2, DOMO, (Math.random()*0.3)+0.2, 4));
+				}
+				animate();
+			}
+			
+			function bot(ai, target, speed, topspeed){
+				this.type = ai;
+				this.target = target;
+				this.speed = speed;
+				this.topspeed = topspeed;
+				
+				switch(ai){
+						case 0:
+							var hlt = 100;
+							var dmg = 0.1;
+							var bst = 1;
+							break;
+						case 1:
+							var hlt = 50;
+							var dmg = 8;
+							var bst = 8;
+							break;
+						case 2:
+							var hlt = 30;
+							var dmg = 4;
+							var bst = 5;
+							break;
+						case 3:
+							var hlt = 10;
+							var dmg = 0.1;
+							var bst = 1;
+							this.hitcnt=0;
+							break;	
+					}
+				this.mhlt = hlt;
+				this.health = hlt;
+				this.damage = dmg;
+				this.bst = bst;
+				this.ht = 0;
+				
+				this.x = 0;
+				this.y = 0;
+				this.au = 0;
+				this.ad = 0;
+				this.ar = 0;
+				this.al = 0;
+				
+				this.a = 0;
+				this.ax = 0;
+				this.ay = 0;
+				this.vx = 0;
+				this.vy = 0;
+				
+				this.ab=0;
+				
+				switch(ai){
+					default:
+						this.x = (1-2*Math.random())*500;
+						this.y = (1-2*Math.random())*250;
+						break;						
+					case 3:
+						this.x = DOMO.x;
+						this.y = DOMO.y;
+						this.a = Math.random()*(Math.PI*2)
+						break;
+				}
+				
+			}
+			
+			bot.prototype.attack = function(){
+				if(this.target){
+					if(this.type && (dist(this.x,this.y,this.target.x,this.target.y)<60)){
+						this.boost = this.bst;
+						if(dist(this.x,this.y,this.target.x,this.target.y)<9 && Date.now()/1000>=this.ht+0.5){
+							if(this.type==3){
+								this.hitcnt++;
+								if(this.hitcnt>=5){
+									this.health=0;
+								}
+							}
+							this.ht=Date.now()/1000;
+							this.target.health -= this.damage;
+						}
+					}else{this.boost=1;}	
+				}else{
+					this.target=0;
+				}
+			}
+			
+			bot.prototype.draw = function(){
+				if(this.health>0){
+					switch(this.type){
+						case 0:
+							ctx.fillStyle = ctx.strokeStyle  = "#f80";
+							ctx.lineWidth=1;
+							ctx.hex(this.x, this.y, 10);
+							ctx.fill();
+							break;
+						case 1:
+							ctx.lineWidth=1;
+							ctx.fillStyle = ctx.strokeStyle  = "#4f4";
+							ctx.polygon(this.x,this.y,10,4,Math.PI/4,1)
+							break;
+						case 2:
+							ctx.lineWidth=1;
+							ctx.fillStyle = ctx.strokeStyle  = "#0Af";
+							ctx.polygon(this.x,this.y,10,3,this.a+Math.PI/6,1);
+							break;
+						case 3:
+							ctx.fillStyle = ctx.strokeStyle  = "#999";
+							ctx.beginPath();
+							ctx.lineWidth=3;
+							ctx.moveTo(this.x,this.y);
+							ctx.lineTo(this.x-3,this.y)
+							ctx.stroke();
+							break;								
+					}
+					if(this.type!=3){
+						ctx.fillStyle = ctx.strokeStyle  = "fff";
+						ctx.beginPath();
+						ctx.lineWidth=1.5;
+						ctx.arc(this.x,this.y,5,0,Math.PI*2*(this.health/this.mhlt));
+						ctx.stroke();
+					}
+				}
+			}
+			
+			bot.prototype.move = function(){
+				if(this.type){
+					switch(this.type){
+						case 1: var d = 300; break;
+						case 2: var d = 500; break;
+						case 3: var d = 700; break;
+					}
+
+					if(this.target && dist(this.x,this.y,this.target.x,this.target.y)<d){
+						this.a = Math.atan2(this.target.y - this.y, this.target.x - this.x);
+						this.ax = this.speed*Math.cos(this.a)+(1-2*Math.random())*this.speed;
+						this.ay = this.speed*Math.sin(this.a)+(1-2*Math.random())*this.speed;
+					}else{
+						this.a += (1-2*Math.random())*Math.PI/16;
+						this.ax = this.speed*Math.cos(this.a);
+						this.ay = this.speed*Math.sin(this.a);
+						
+					}
+					
+					for(var i=0; i<aia.length; i++){
+						if(aia[i]!=this){
+							if(dist(this.x,this.y,aia[i].x,aia[i].y)<13){
+								var a = -(Math.atan2(aia[i].y - this.y, aia[i].x - this.x));
+								this.ax += 2*Math.cos(a);
+								this.ay += 2*Math.sin(a);
+							}
+						}
+					}
+				}
+				
+				this.vx += this.al+this.ar+this.ax;
+				this.vy += this.au+this.ad+this.ay;
+				
+				if(this.type){
+					var a = Math.atan2(this.vy, this.vx);
+					var v = Math.min(dist(this.vx,this.vy,0,0), this.topspeed);
+					
+					this.vx = v*Math.cos(a%(Math.PI*2));
+					this.vy = v*Math.sin(a%(Math.PI*2));
+				}
+				
+				this.vx *= friction;
+				this.vy *= friction;
+				
+				( Math.abs(this.x + this.vx) > cv.width/(2*window.devicePixelRatio) )? this.x = -this.x : this.x += this.vx;
+				( Math.abs(this.y + this.vy) > cv.height/(2*window.devicePixelRatio) )? this.y = -this.y : this.y += this.vy;
+				
+			}
+			
+			function animate(){
+			
+				ctx.clear();
+				for( var i=0; i<aia.length; i++ ){
+					if(aia[i] && aia[i].health>0){
+						aia[i].attack();
+						aia[i].move();
+						aia[i].draw();
+					}else{
+						delete aia[i];
+						aia.splice(i, 1);
+					}
+				}
+				for( var i=0; i<gaia.length; i++ ){
+					if(gaia[i] && gaia[i].health>0){
+						gaia[i].attack();
+						gaia[i].move();
+						gaia[i].draw();
+					}else{
+						delete gaia[i];
+						gaia.splice(i, 1);
+					}
+				}
+				if(DOMO && DOMO.health>0){
+					DOMO.move();
+					DOMO.draw();
+				}else{
+					delete DOMO;
+					DOMO=0;
+					for(i in aia){
+						if(aia[i].type!=3){aia[i].target=0;}
+					}
+				}
+				
+				window.requestAnimFrame(animate);
+			}
+			
+			function dist(x,y,x2,y2){
+				return Math.sqrt(Math.pow(x2-x,2)+Math.pow(y2-y,2));
+			}
+			 
+			document.onkeydown = function(e){
+				switch(e.keyCode){
+					case "W".charCodeAt(0): DOMO.au = -0.5; break;
+					case "S".charCodeAt(0): DOMO.ad = 0.5; break;
+					case "D".charCodeAt(0): DOMO.ar = 0.5; break;
+					case "A".charCodeAt(0): DOMO.al = -0.5; break;
+					case 32: if(gaia.length<50){for(var i=0; i<200; i++){gaia.push(new bot(3, aia[Math.round(Math.random()*(aia.length-1))], (Math.random()*0.3)+0.5, 8));}} break;
+				}
+			}
+			
+			document.onkeyup = function(e){
+				switch(e.keyCode){
+					case "W".charCodeAt(0): DOMO.au = 0; break;
+					case "S".charCodeAt(0): DOMO.ad = 0; break;
+					case "D".charCodeAt(0): DOMO.ar = 0; break;
+					case "A".charCodeAt(0): DOMO.al = 0; break;
+				}
+			}
+		</script>
+	</head>
+	<body>
+		<center>
+		<canvas vertical-align="middle" id="canvas"></canvas>
+		</center>
+	</body>
+</html>
