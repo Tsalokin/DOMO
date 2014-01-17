@@ -27,12 +27,13 @@ function ai(type){
 			this.hlt = 20;
 			this.mhlt = 20;
 			this.dmg = 1;
+			this.bstr = 10;
 			this.ht = 0;
 			this.rld = 0;
 			this.rldt = rndr(150,200);
 			this.bsize = 10;
-			this.expvel = 20;
-			this.exprad = 100;
+			this.expvel = 5;
+			this.exprad = 75;
 			this.td = 200;
 			this.bst = 3;
 			this.speed = rndr(0.2,0.3,1);

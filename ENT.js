@@ -84,9 +84,9 @@ ENT.prototype.move = function(){
 	switch(this.type){
 		case 4: //bubbles
 			if(this.size <= this.maxsz) this.size+=this.expvel;
-			//else death(ent,this);
+			else death(ent,ent[ent.indexOf(this)]);
 			break;
-		default:
+		default: //bullets
 			this.x+=this.vx*Math.cos(this.a);
 			this.y+=this.vy*Math.sin(this.a);
 			break;

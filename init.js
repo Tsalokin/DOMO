@@ -53,7 +53,7 @@ function animate(){
 		ctx.fillStyle="#000";
 		ctx.fillText(bai.length,ctx.x-700,ctx.y-350);
 		
-		for(var i=0; i<bai.length; i++){
+		for(var i=0; i<bai.length; i++){ //friendly bullet hits
 			var efnd = etree.retrieve(bai[i]);
 			var fnd = nn(bai[i],efnd);
 			if((fnd[0]<10)&&(bai.indexOf(fnd[1].frm)==-1)){
@@ -62,20 +62,28 @@ function animate(){
 			}
 		}
 		
-		for(var i=0; i<gai.length; i++){
+		for(var i=0; i<gai.length; i++){ //enemy bullet hits
 			var efnd = etree.retrieve(gai[i]);
 			var fnd = nn(gai[i],efnd);
-			if((fnd[0]<10)&&(gai.indexOf(fnd[1].frm)==-1)){
-				gai[i].hlt-=fnd[1].dmg;
-				if(fnd[1].type!=4) death(ent,fnd[1]);
+			if(gai.indexOf(fnd[1].frm)==-1){ //means bullet is not friendly fire
+			
+				if(!fnd[1].size&&(fnd[0]<10)){ // not a bubble attack, and close enough to hit, damages good AI and de-spawns bullet
+					//gai[i].hlt-=fnd[1].dmg;
+					death(ent,fnd[1]);
+				}else if(fnd[1].size&& (fnd[0]<fnd[1].size)){ // bubble attack close enough to hit, will repel and damage good AI
+					//gai[i].hlt-=fnd[1].dmg;
+					var rpfact=(fnd[1].bstr/(dist(gai[i],fnd[1])+1));
+					var a = Math.atan2( gai[i].y-fnd[1].y, gai[i].x-fnd[1].x);
+					console.log(fnd[1].bstr+"  "+(dist(gai[i],fnd[1])+1)+" "+(rpfact*Math.cos(a)+gai[i].vx));
+					gai[i].vx = rpfact*Math.cos(a)+gai[i].vx;
+					gai[i].vy = rpfact*Math.sin(a)+gai[i].vy;	
+				}
 			}
 		}
-		
 		for(var i in bai){
 			bai[i].draw();
 			bai[i].color=0;
 			bai[i].move();
-			var close = nn(bai[i],ent);
 			if(bai[i].hlt<=0){death(bai,bai[i])}
 		}
 		
