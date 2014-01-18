@@ -86,11 +86,10 @@ function animate(){
 			bai[i].move();
 			if(bai[i].hlt<=0){death(bai,bai[i])}
 		}
-		
+		ctx.fillStyle = "#000";
+		ctx.fillText(Math.round(DOMO.x)+", "+Math.round(DOMO.y), DOMO.x,DOMO.y-18);
 		for(var i=0; i<gai.length; i++){
 			gai[i].draw();
-			ctx.fillStyle = "#000";
-			ctx.fillText(Math.round(DOMO.x)+", "+Math.round(DOMO.y), DOMO.x,DOMO.y-18);
 			gai[i].move();
 			if(gai[i].hlt<=0){death(gai,gai[i]);}
 		}
@@ -101,7 +100,6 @@ function animate(){
 				ent[i].move();
 				if(Math.abs(ent[i].ct-ticker)>=200){
 					death(ent,ent[i]);
-					i--;
 				}
 			}catch(error){
 				console.log("SHIT");
@@ -192,6 +190,11 @@ function mapdrw(){
 
 function death(arr,obj){
 	arr.splice(arr.indexOf(obj),1);
+	for(i in obj){
+		obj[i]="";
+		delete obj[i];
+	}
+	obj=0;
 	delete obj;
 }
 
@@ -220,10 +223,11 @@ document.onkeydown = function(e){
 		case "D".charCodeAt(0): DOMO.ar = 0.5; break;
 		case "A".charCodeAt(0): DOMO.al = -0.5; break;
 		case "E".charCodeAt(0): autotarg = !autotarg; break;
-		case "T".charCodeAt(0): DOMO.target = Dntarget(); break;
 		case "P".charCodeAt(0): pause=!pause; break;
 		case "1".charCodeAt(0): DOMO.wpn=1; break;
-		case "2".charCodeAt(0):	DOMO.wpn=2; break;
+		case "G".charCodeAt(0):	DOMO.shoot(2); break;
+		case "3".charCodeAt(0):	DOMO.wpn=0; break;
+		case "H".charCodeAt(0):	DOMO.shoot(3); break;
 		case 32: break;
 	}
 }

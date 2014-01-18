@@ -1,5 +1,14 @@
 function ai(type){
 	this.type=type;
+	this.w = 60;
+	this.h = 60;
+	this.a=0;
+	this.ax = 0;
+	this.ay = 0;
+	this.vx = 0;
+	this.vy = 0;
+	this.x = (1-2*Math.random())*2000;
+	this.y = (1-2*Math.random())*2000;
 	this.target = DOMO;
 	switch(this.type){
 		case 0: //triangles
@@ -30,7 +39,7 @@ function ai(type){
 			this.bstr = 1000;
 			this.ht = 0;
 			this.rld = 0;
-			this.fadetime = 10;
+			this.fadetime = 30;
 			this.fadeini=this.fadetime;
 			this.rldt = rndr(100,200);
 			this.bsize = 10;
@@ -41,33 +50,42 @@ function ai(type){
 			this.speed = rndr(0.2,0.3,1);
 			this.vd = 600;
 			break;
+		case 3: //friendlies
+			this.hlt = 2;
+			this.mhlt = 2;
+			this.dmg = 0.5;
+			this.ht = 0;
+			this.rld = 0;
+			this.bst = 3;
+			this.speed = rndr(0.2,0.7,1);
+			this.vd = 1000;
+			this.target = bai[Math.floor((Math.random()*bai.length+1))];
+			this.x=DOMO.x+rndr(-25,25);
+			this.y=DOMO.y+rndr(-25,25);
+			break;
 	}
-	this.w = 60;
-	this.h = 60;
-	this.a=0;
-	this.ax = 0;
-	this.ay = 0;
-	this.vx = 0;
-	this.vy = 0;
-	this.x = (1-2*Math.random())*2000;
-	this.y = (1-2*Math.random())*2000;
+	
 }
 
 ai.prototype.draw = function(){
 	switch(this.type){
-		case 0:
+		case 0: //square mobs
+			ctx.beginPath();
 			ctx.lineWidth=1;
 			ctx.fillStyle = ctx.strokeStyle = "#0AF";
 			ctx.polygon(this.x,this.y,10,3,this.a,1);
+			ctx.closePath();
 			break;
 
-		case 1:
+		case 1: //triangle mobs
+			ctx.beginPath();
 			ctx.lineWidth=1;
 			ctx.fillStyle = "#4F4";
 			ctx.fillRect(this.x-7,this.y-7,14,14);
+			ctx.closePath();
 			break;
 			
-		case 2:
+		case 2: //circle mobs
 			ctx.lineWidth=1;
 			ctx.fillStyle = "#4B0082";
 			ctx.beginPath();
@@ -75,19 +93,31 @@ ai.prototype.draw = function(){
 			ctx.fill();
 			ctx.closePath();
 			break;
+		
+		case 3: //friendlies
+			ctx.lineWidth=4;
+			ctx.strokeStyle = "#f0D";
+			ctx.beginPath();
+			this.speed=1;
+			ctx.moveTo(this.x-2,this.y);
+			ctx.lineTo(this.x+2,this.y);
+			ctx.stroke();
+			ctx.closePath();
+			break;
 			
 	}
-	
-	ctx.beginPath();
-	ctx.fillStyle = ctx.strokeStyle  = "fff";
-	ctx.lineWidth=1.5;
-	ctx.arc(this.x,this.y,4.5,0,(Math.PI*2*(this.hlt/this.mhlt)));
-	ctx.stroke();
-	ctx.closePath();
+	if(this.type!=3){
+		ctx.beginPath();
+		ctx.fillStyle = ctx.strokeStyle  = "fff";
+		ctx.lineWidth=1.5;
+		ctx.arc(this.x,this.y,4.5,0,(Math.PI*2*(this.hlt/this.mhlt)));
+		ctx.stroke();
+		ctx.closePath();
+	}
 }
 
 ai.prototype.move = function(){
-	var targ = [dist(this,DOMO),DOMO];
+	var targ = [dist(this,this.target),this.target];
 	this.target = targ[1];
 	if(this.target && targ[0] < this.vd){
 		this.a += mnmx(-Math.PI/16, Math.PI/16, angle( this.a, Math.atan2( this.target.y - this.y, this.target.x - this.x) ));
