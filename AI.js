@@ -57,9 +57,10 @@ function ai(type){
 			this.ht = 0;
 			this.rld = 0;
 			this.bst = 3;
-			this.speed = rndr(0.2,0.7,1);
+			this.speed = rndr(0.5,0.7,1);
 			this.vd = 1000;
-			this.target = bai[Math.floor((Math.random()*bai.length+1))];
+			this.target = bai[rndr(0,bai.length)];
+			this.a = Math.random()*Math.PI*2;
 			this.x=DOMO.x+rndr(-25,25);
 			this.y=DOMO.y+rndr(-25,25);
 			break;
@@ -87,7 +88,7 @@ ai.prototype.draw = function(){
 			
 		case 2: //circle mobs
 			ctx.lineWidth=1;
-			ctx.fillStyle = "#4B0082";
+			ctx.fillStyle = "#408";
 			ctx.beginPath();
 			ctx.arc(this.x,this.y,8,0,Math.PI*2);
 			ctx.fill();
@@ -96,7 +97,7 @@ ai.prototype.draw = function(){
 		
 		case 3: //friendlies
 			ctx.lineWidth=4;
-			ctx.strokeStyle = "#f0D";
+			ctx.strokeStyle = "#F0D";
 			ctx.beginPath();
 			this.speed=1;
 			ctx.moveTo(this.x-2,this.y);
@@ -108,7 +109,7 @@ ai.prototype.draw = function(){
 	}
 	if(this.type!=3){
 		ctx.beginPath();
-		ctx.fillStyle = ctx.strokeStyle  = "fff";
+		ctx.fillStyle = ctx.strokeStyle  = "FFF";
 		ctx.lineWidth=1.5;
 		ctx.arc(this.x,this.y,4.5,0,(Math.PI*2*(this.hlt/this.mhlt)));
 		ctx.stroke();
@@ -124,6 +125,7 @@ ai.prototype.move = function(){
 		this.ax = (Math.cos(this.a)+(1-2*Math.random()))*this.speed;
 		this.ay = (Math.sin(this.a)+(1-2*Math.random()))*this.speed;
 	}else{
+		if(this.type==3){this.target = bai[rndr(0,bai.length)];}
 		if(ticker%10==0){
 			this.a += (1-2*Math.random())*Math.PI/12;
 		}else if((Math.abs(this.x) == 2000) || (Math.abs(this.y) == 2000)){
@@ -151,6 +153,7 @@ ai.prototype.attack = function(){
 	if(Math.abs(this.ht-ticker)>=15){
 		this.target.hlt-=this.dmg;
 		this.ht = ticker;
+		if(this.type==3) this.hlt-=this.dmg;
 	}
 	
 }

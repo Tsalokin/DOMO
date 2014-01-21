@@ -53,7 +53,7 @@ function animate(){
 		ctx.fillStyle="#000";
 		ctx.fillText(bai.length,ctx.x-700,ctx.y-350);
 		
-		for(var i=0; i<bai.length; i++){ //friendly bullet hits
+		for(var i=0; i<bai.length; i++){ //friendly bullets
 			var efnd = etree.retrieve(bai[i]);
 			var fnd = nn(bai[i],efnd);
 			if((fnd[0]<10)&&(bai.indexOf(fnd[1].frm)==-1)){
@@ -62,17 +62,15 @@ function animate(){
 			}
 		}
 		
-		for(var i=0; i<gai.length; i++){ //enemy bullet hits
+		for(var i=0; i<gai.length; i++){ //enemy bullets
 			var efnd = etree.retrieve(gai[i]);
 			var fnd = nn(gai[i],efnd);
 			if(gai.indexOf(fnd[1].frm)==-1){ //means bullet is not friendly fire
-			
 				if((!fnd[1].size)&&(fnd[0]<10)){ // not a bubble attack, and close enough to hit, damages good AI and de-spawns bullet
 					gai[i].hlt-=fnd[1].dmg;
 					death(ent,fnd[1]);
 				}else if(fnd[1].size&& (fnd[0]<fnd[1].size)){ // bubble attack close enough to hit, will repel and damage good AI
-					
-					var rpfact=(fnd[1].bstr/(dist(gai[i],fnd[1])+1));
+					var rpfact=mnmx(13,19,fnd[1].bstr/(fnd[0])+1);
 					var a = Math.atan2( gai[i].y-fnd[1].y, gai[i].x-fnd[1].x);
 					gai[i].vx = rpfact*Math.cos(a)+gai[i].vx;
 					gai[i].vy = rpfact*Math.sin(a)+gai[i].vy;
@@ -80,12 +78,15 @@ function animate(){
 				}
 			}
 		}
+		
+		//bai loop
 		for(var i=0; i<bai.length; i++){
 			bai[i].draw();
-			bai[i].color=0;
 			bai[i].move();
 			if(bai[i].hlt<=0){death(bai,bai[i])}
 		}
+		
+		//gai loop
 		ctx.fillStyle = "#000";
 		ctx.fillText(Math.round(DOMO.x)+", "+Math.round(DOMO.y), DOMO.x,DOMO.y-18);
 		for(var i=0; i<gai.length; i++){
@@ -93,7 +94,7 @@ function animate(){
 			gai[i].move();
 			if(gai[i].hlt<=0){death(gai,gai[i]);}
 		}
-		
+		//ent loop
 		for(var i=0; i<ent.length; i++){
 			try{
 				ent[i].draw();
@@ -149,6 +150,17 @@ function distsq(cur,targ){
 	}
 }
 
+function retrv(obj,rng,tree){
+	var ofnd = tree.retrieve(obj);
+	var target = nn(obj, ofnd);
+	if((target[0]<rng)&&(target)){
+		target = target[1]; 
+	}else{
+		target=-1;
+	}
+	return target;
+}
+
 function nn(cur,wht){
 	var close = 0;
 	var closest = [Infinity,0];
@@ -190,12 +202,9 @@ function mapdrw(){
 
 function death(arr,obj){
 	arr.splice(arr.indexOf(obj),1);
-	for(i in obj){
-		obj[i]="";
+	for(var i in obj){
 		delete obj[i];
 	}
-	obj=0;
-	delete obj;
 }
 
 function sign(x){
@@ -225,9 +234,9 @@ document.onkeydown = function(e){
 		case "E".charCodeAt(0): autotarg = !autotarg; break;
 		case "P".charCodeAt(0): pause=!pause; break;
 		case "1".charCodeAt(0): DOMO.wpn=1; break;
-		case "G".charCodeAt(0):	DOMO.shoot(2); break;
+		case "2".charCodeAt(0):	DOMO.wpn=2; break;
 		case "3".charCodeAt(0):	DOMO.wpn=0; break;
-		case "H".charCodeAt(0):	DOMO.shoot(3); break;
+		case "F".charCodeAt(0):	DOMO.shoot(3); break;
 		case 32: break;
 	}
 }

@@ -22,15 +22,15 @@ function ENT(type,frm,cnt){
 			this.x = frm.x+5*Math.cos(frm.ga);
 			this.y = frm.y+5*Math.sin(frm.ga);
 			break;
-		case 2:
+		case 2: //shotgun
 			var r = (1-2*Math.random())*Math.PI/64;
 			this.ct = ticker;
 			this.dmg = 1;
 			this.a = frm.ga+((cnt-9.5)*Math.PI/128+r);
-			this.vx = 7;
-			this.vy = 7;
-			this.x = frm.x+15*Math.cos(frm.ga+(cnt-9.5)*Math.PI/64+r);
-			this.y = frm.y+15*Math.sin(frm.ga+(cnt-9.5)*Math.PI/64+r);
+			this.vx = 10;
+			this.vy = 10;
+			this.x = frm.x+15*Math.cos(frm.ga+(cnt-9.5)*Math.PI/64+r)+rndr(0,1);
+			this.y = frm.y+15*Math.sin(frm.ga+(cnt-9.5)*Math.PI/64+r)+rndr(0,1);
 			break;
 		case 3:
 			this.ct = ticker;

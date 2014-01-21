@@ -1,8 +1,7 @@
 function DOMO(){
-	this.cooldowns={mins:120, shtgn: 10};
-	this.times={mins:0, shtgn:0};
+	this.coldn = {mins:120, shtgn:15, mini:5, rifl:8};
+	this.time = {mins:0, shtgn:0, mini:0, rifl:0};
 	this.target = -1;
-	this.rldt = 10;
 	this.st = 10;
 	this.hlt = 1000;
 	this.mhlt = 1000;
@@ -31,7 +30,7 @@ DOMO.prototype.draw = function(){
 	
 	if(Math.abs(this.st-ticker)>=50){
 		var ofnd = atree.retrieve(DOMO);
-		this.target = nn(DOMO, ofnd);
+		this.target = nn(this, ofnd);
 		if((this.target[0]<750)&&(this.target)){
 			this.target = this.target[1]; 
 			this.st=ticker;
@@ -111,10 +110,10 @@ DOMO.prototype.draw = function(){
 		this.bubble = false;
 	}
 	
-	this.sht ? DOMO.shoot(this.wpn): 0;
+	if(this.sht) DOMO.shoot(this.wpn);
 	
-	for( var i in this.times){
-		this.times[i]+=1;
+	for( var i in this.time){
+		this.time[i]+=1;
 	}
 }
 
@@ -132,8 +131,8 @@ DOMO.prototype.move = function(){
 DOMO.prototype.shoot = function(type){
 	switch(type){
 		case 0:
-			if(Math.abs(this.rldt-ticker)>=3){
-				this.rldt = ticker;
+			if(this.time.mini-this.coldn.mini>=0){
+				this.time.mini = 0;
 				var cnt = 0;
 				for(var i=0; i<3; i++){
 					cnt++;
@@ -142,24 +141,24 @@ DOMO.prototype.shoot = function(type){
 			}
 			break;
 		case 1:
-			if(Math.abs(this.rldt-ticker)>=6){
-				this.rldt = ticker;
+			if(this.time.rifl-this.coldn.rifl>=0){
+				this.time.rifl = 0;
 				ent.push(new ENT(1,this));
 			}
 			break;
 		case 2:
-			if(this.times.shtgn-this.cooldowns.shtgn>=0){
-				this.times.shtgn=0;
+			if(this.time.shtgn-this.coldn.shtgn>=0){
+				this.time.shtgn=0;
 				var cnt = 0;
-				for(var i=0; i<20; i++){
+				for(var i=0; i<12; i++){
 					cnt++;
 					ent.push(new ENT(2,this,cnt));
 				}
 			}
 			break;
 		case 3:
-			if(this.times.mins-this.cooldowns.mins>=0){
-				this.times.mins=0;
+			if(this.time.mins-this.coldn.mins>=0){
+				this.time.mins=0;
 				for(var i=0; i<50; i++){
 					gai.push(new ai(3));
 				}
